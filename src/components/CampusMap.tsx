@@ -25,7 +25,7 @@ const CATEGORY_COLORS: Record<EventCategory, string> = {
   Sports: "#10b981",
   Coding: "#3b82f6",
   Study: "#f59e0b",
-  Controversy: "#ef4444",
+  Misc: "#ef4444",
 };
 
 function coloredIcon(color: string) {
