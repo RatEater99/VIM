@@ -13,6 +13,12 @@ L.Icon.Default.mergeOptions({
 });
 
 const CENTER: [number, number] = [16.49414, 80.499176];
+const BOUNDS: [[number, number], [number, number]] = [
+  [16.4895, 80.4945], // SW
+  [16.4990, 80.5040], // NE
+];
+const MIN_ZOOM = 16;
+const MAX_ZOOM = 19;
 
 const CATEGORY_COLORS: Record<EventCategory, string> = {
   Music: "#8b5cf6",
@@ -97,7 +103,16 @@ export default function CampusMap() {
 
   return (
     <div className="relative h-full w-full">
-      <MapContainer center={CENTER} zoom={16} className="h-full w-full" scrollWheelZoom>
+      <MapContainer
+        center={CENTER}
+        zoom={17}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
+        maxBounds={BOUNDS}
+        maxBoundsViscosity={1.0}
+        className="h-full w-full"
+        scrollWheelZoom
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

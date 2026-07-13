@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import { Header } from "@/components/Header";
 
 const CampusMap = lazy(() => import("@/components/CampusMap"));
@@ -17,20 +17,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   return (
     <div className="h-screen flex flex-col">
       <Header />
       <main className="flex-1 min-h-0">
-        {mounted ? (
-          <Suspense fallback={<div className="p-6 text-muted-foreground">Loading map…</div>}>
-            <CampusMap />
-          </Suspense>
-        ) : (
-          <div className="p-6 text-muted-foreground">Loading map…</div>
-        )}
+        <Suspense fallback={<div className="p-6 text-muted-foreground">Loading map…</div>}>
+          <CampusMap />
+        </Suspense>
       </main>
     </div>
   );
 }
+
