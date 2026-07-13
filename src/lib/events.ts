@@ -15,8 +15,8 @@ import {
 } from "firebase/firestore";
 import { db, MAX_EVENTS_PER_DAY } from "./firebase";
 
-export type EventCategory = "Music" | "Sports" | "Coding" | "Study" | "Controversy";
-export const CATEGORIES: EventCategory[] = ["Music", "Sports", "Coding", "Study", "Controversy"];
+export type EventCategory = "Music" | "Sports" | "Coding" | "Study" | "Misc";
+export const CATEGORIES: EventCategory[] = ["Music", "Sports", "Coding", "Study", "Misc"];
 
 export interface EventDoc {
   id: string;
