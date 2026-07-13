@@ -115,7 +115,7 @@ export default function CampusMap() {
         ))}
         {pending && (
           <Marker position={pending} icon={icons[category]}>
-            <Popup autoOpen closeOnClick={false} closeButton={false}>
+            <Popup closeOnClick={false} closeButton={false}>
               <div className="space-y-2 min-w-[180px]">
                 <div className="font-semibold text-sm">New event</div>
                 <select
