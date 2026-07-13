@@ -1,8 +1,20 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 
 export function Header() {
   const { user, isAdmin, signIn, signOutUser } = useAuth();
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function handleSignIn() {
+    setMsg(null);
+    try {
+      await signIn();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Sign-in failed");
+    }
+  }
+
   return (
     <header className="h-14 border-b bg-card flex items-center justify-between px-4 z-[1001] relative">
       <Link to="/" className="font-bold text-lg">Campus Map</Link>
@@ -16,9 +28,15 @@ export function Header() {
             <button onClick={() => void signOutUser()} className="text-sm border rounded px-3 py-1.5 hover:bg-accent">Sign out</button>
           </>
         ) : (
-          <button onClick={() => void signIn()} className="text-sm bg-primary text-primary-foreground rounded px-3 py-1.5 hover:opacity-90">Sign in with Google</button>
+          <button onClick={handleSignIn} className="text-sm bg-primary text-primary-foreground rounded px-3 py-1.5 hover:opacity-90">Sign in with Google</button>
         )}
       </nav>
+      {msg && (
+        <div className="absolute top-full right-4 mt-2 bg-card border shadow-lg rounded px-3 py-2 text-xs max-w-xs">
+          {msg}
+        </div>
+      )}
     </header>
   );
 }
+
