@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 const CampusMap = lazy(() => import("@/components/CampusMap"));
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Campus Map — University Events" },
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
 
 function Index() {
   return (
