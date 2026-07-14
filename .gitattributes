@@ -1,0 +1,8 @@
+# Force correct language classification
+*.hc linguist-language=HolyC
+*.asm linguist-language=Assembly
+*.ml linguist-language=OCaml
+
+# IGNORE EXISTING FILES (Crucial: replace 'src/' with your actual folder names)
+src/* linguist-detectable=false
+docs/* linguist-detectable=false
