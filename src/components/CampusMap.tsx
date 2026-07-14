@@ -207,6 +207,7 @@ export default function CampusMap() {
             onClick={(e) => e.stopPropagation()}
           >
             <div>
+              {/* Comment here */}
               <h2 className="text-lg font-semibold">New Event</h2>
               <p className="text-xs text-muted-foreground mt-1">
                 {pending[0].toFixed(5)}, {pending[1].toFixed(5)}
