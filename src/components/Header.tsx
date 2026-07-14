@@ -17,7 +17,7 @@ export function Header() {
 
   return (
     <header className="h-14 border-b bg-card flex items-center justify-between px-4 z-[1001] relative">
-      <Link to="/" className="font-bold text-lg">Campus Map</Link>
+      <Link to="/" className="font-bold text-lg">VIM</Link>
       <nav className="flex items-center gap-3">
         {isAdmin && (
           <Link to="/admin" className="text-sm hover:underline">Admin</Link>

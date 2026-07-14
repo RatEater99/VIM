@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Campus Map — University Events" },
+      { title: "VIM - VIT Interactive Map" },
       { name: "description", content: "Discover and share campus events on an interactive map." },
       { property: "og:title", content: "Campus Map — University Events" },
       { property: "og:description", content: "Discover and share campus events on an interactive map." },
