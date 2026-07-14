@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { toast } from "sonner";
 import { CATEGORIES, createEvent, ensureCanCreate, subscribeEvents, type EventCategory, type EventDoc } from "@/lib/events";
 import { useAuth } from "@/lib/auth";
 
@@ -14,11 +15,11 @@ L.Icon.Default.mergeOptions({
 
 const CENTER: [number, number] = [16.49414, 80.499176];
 const BOUNDS: [[number, number], [number, number]] = [
-  [16.4895, 80.4945], // SW
-  [16.4990, 80.5040], // NE
+  [16.4895, 80.4945],
+  [16.4990, 80.5040],
 ];
-const MIN_ZOOM = 16;
-const MAX_ZOOM = 19;
+const MIN_ZOOM = 12;
+const MAX_ZOOM = 18;
 
 const CATEGORY_COLORS: Record<EventCategory, string> = {
   Music: "#8b5cf6",
@@ -53,7 +54,6 @@ export default function CampusMap() {
   const [placing, setPlacing] = useState(false);
   const [pending, setPending] = useState<[number, number] | null>(null);
   const [category, setCategory] = useState<EventCategory>("Music");
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => subscribeEvents(setEvents), []);
@@ -64,26 +64,37 @@ export default function CampusMap() {
   );
 
   async function handleAddClick() {
-    setError(null);
     if (!user) {
-      await signIn();
+      try {
+        await signIn();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Sign-in failed");
+      }
       return;
     }
     const check = await ensureCanCreate(user.uid);
     if (!check.ok) {
-      setError(check.reason ?? "Cannot create event");
+      toast.error(check.reason ?? "Cannot create event");
       return;
     }
     setPlacing(true);
+    toast("Click anywhere on the map to place your event.");
+  }
+
+  function cancel() {
+    setPending(null);
+    setPlacing(false);
   }
 
   async function handleSave() {
     if (!user || !pending) return;
     setSaving(true);
-    setError(null);
     try {
       const check = await ensureCanCreate(user.uid);
-      if (!check.ok) throw new Error(check.reason);
+      if (!check.ok) {
+        toast.error(check.reason ?? "Limit reached");
+        return;
+      }
       await createEvent({
         lat: pending[0],
         lng: pending[1],
@@ -92,10 +103,10 @@ export default function CampusMap() {
         email: user.email ?? "",
         name: user.displayName ?? "Anonymous",
       });
-      setPending(null);
-      setPlacing(false);
+      toast.success("Event added!");
+      cancel();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save");
+      toast.error(e instanceof Error ? e.message : "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -116,8 +127,9 @@ export default function CampusMap() {
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={MAX_ZOOM}
         />
-        <ClickCapture enabled={placing} onPick={setPending} />
+        <ClickCapture enabled={placing && !pending} onPick={setPending} />
         {events.map((ev) => (
           <Marker key={ev.id} position={[ev.lat, ev.lng]} icon={icons[ev.category] ?? icons.Music}>
             <Popup>
@@ -128,52 +140,24 @@ export default function CampusMap() {
             </Popup>
           </Marker>
         ))}
-        {pending && (
-          <Marker position={pending} icon={icons[category]}>
-            <Popup closeOnClick={false} closeButton={false}>
-              <div className="space-y-2 min-w-[180px]">
-                <div className="font-semibold text-sm">New event</div>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as EventCategory)}
-                  className="w-full border rounded px-2 py-1 text-sm"
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex-1 bg-primary text-primary-foreground rounded px-2 py-1 text-sm disabled:opacity-50"
-                  >
-                    {saving ? "Saving…" : "Save"}
-                  </button>
-                  <button
-                    onClick={() => { setPending(null); setPlacing(false); }}
-                    className="flex-1 border rounded px-2 py-1 text-sm"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        )}
+        {pending && <Marker position={pending} icon={icons[category]} />}
       </MapContainer>
 
       <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2 items-end">
-        <button
-          onClick={handleAddClick}
-          className="bg-primary text-primary-foreground shadow-lg rounded-full px-5 py-2.5 font-medium hover:opacity-90"
-        >
-          {placing ? (pending ? "Choose category ↓" : "Click on map…") : "+ Add Event"}
-        </button>
-        {error && (
-          <div className="bg-destructive text-destructive-foreground text-sm rounded px-3 py-2 shadow max-w-xs">
-            {error}
-          </div>
+        {!placing ? (
+          <button
+            onClick={handleAddClick}
+            className="bg-primary text-primary-foreground shadow-lg rounded-full px-5 py-2.5 font-medium hover:opacity-90"
+          >
+            + Add Event
+          </button>
+        ) : (
+          <button
+            onClick={cancel}
+            className="bg-card border shadow-lg rounded-full px-5 py-2.5 font-medium hover:bg-accent"
+          >
+            {pending ? "Change location" : "Click on map…"} · Cancel
+          </button>
         )}
       </div>
 
@@ -188,6 +172,49 @@ export default function CampusMap() {
           ))}
         </div>
       </div>
+
+      {pending && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4" onClick={cancel}>
+          <div
+            className="bg-card rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h2 className="text-lg font-semibold">New Event</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {pending[0].toFixed(5)}, {pending[1].toFixed(5)}
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as EventCategory)}
+                className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={cancel}
+                className="flex-1 border rounded-md px-3 py-2 text-sm hover:bg-accent"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 bg-primary text-primary-foreground rounded-md px-3 py-2 text-sm font-medium disabled:opacity-50"
+              >
+                {saving ? "Saving…" : "Save Event"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
