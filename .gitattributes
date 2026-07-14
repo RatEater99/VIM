@@ -12,6 +12,4 @@
 *.html linguist-detectable=false
 *.json linguist-detectable=false
 
-# 3. GLOBAL NUCEAR OPTION FOR ALL OTHER FILES
-* linguist-detectable=false
 
