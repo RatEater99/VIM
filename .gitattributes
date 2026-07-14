@@ -1,8 +1,16 @@
-# Force correct language classification
+# 1. FORCE THE THREE DUMMY FILES TO TRACK CORRECTLY
 *.hc linguist-language=HolyC
 *.asm linguist-language=Assembly
 *.ml linguist-language=OCaml
 
-# IGNORE EXISTING FILES (Crucial: replace 'src/' with your actual folder names)
-src/* linguist-detectable=false
-docs/* linguist-detectable=false
+# 2. FORCE GITHUB TO BLINDLY IGNORE ALL TS AND JS FILETYPES
+*.ts linguist-detectable=false
+*.tsx linguist-detectable=false
+*.js linguist-detectable=false
+*.jsx linguist-detectable=false
+
+# 3. GLOBAL FALLBACK TO IGNORE COMMON BUILD/NODE FOLDERS
+node_modules/** linguist-vendored
+dist/** linguist-vendored
+build/** linguist-vendored
+
