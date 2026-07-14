@@ -1,16 +1,17 @@
 # 1. FORCE THE THREE DUMMY FILES TO TRACK CORRECTLY
-*.hc linguist-language=HolyC
-*.asm linguist-language=Assembly
-*.ml linguist-language=OCaml
+*.hc linguist-language=HolyC linguist-detectable=true
+*.asm linguist-language=Assembly linguist-detectable=true
+*.ml linguist-language=OCaml linguist-detectable=true
 
-# 2. FORCE GITHUB TO BLINDLY IGNORE ALL TS AND JS FILETYPES
-*.ts linguist-detectable=false
-*.tsx linguist-detectable=false
+# 2. EXPLICITLY SHUT DOWN WEB LANGUAGES NO MATTER WHERE THEY ARE
+*.css linguist-detectable=false
 *.js linguist-detectable=false
 *.jsx linguist-detectable=false
+*.ts linguist-detectable=false
+*.tsx linguist-detectable=false
+*.html linguist-detectable=false
+*.json linguist-detectable=false
 
-# 3. GLOBAL FALLBACK TO IGNORE COMMON BUILD/NODE FOLDERS
-node_modules/** linguist-vendored
-dist/** linguist-vendored
-build/** linguist-vendored
+# 3. GLOBAL NUCEAR OPTION FOR ALL OTHER FILES
+* linguist-detectable=false
 
